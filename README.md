@@ -28,17 +28,19 @@ July 18, 2021
 
 # Options
 
-Features an in-game option which allows **merchant scaling** to be enabled or disabled.
+- Features an in-game option which allows **merchant scaling** to be enabled or disabled.
 
-Features an in-game option which allows player **frame scaling** to be enabled or disabled.
+- Features an in-game option which allows player **frame scaling** to be enabled or disabled.
 
-Features an in-game option which allows objective **tracker scaling** to be enabled or disabled.
+- Features an in-game option which allows objective **tracker scaling** to be enabled or disabled.
 
 
 
 # Installation
 
 1. Copy the entire add-on folder to your add-on directory.
+
+2. Run the game.
 
 
 
