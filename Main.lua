@@ -1,145 +1,251 @@
+
+local ADDON_NAME = "Old Eyes"
+local SCALE_VALUE = 1.25
+
 local Frame = CreateFrame("Frame")
-local SCALE_VALUE = 1.25;
 
--- Event Registration
-Frame:RegisterEvent("PLAYER_LOGIN")
+local pendingFrames = {}
+local optionsCategory
+
+-- Initialize default settings.
+local function InitializeSavedVariables()
+
+    if ScaleMerchantFrame == nil then
+        ScaleMerchantFrame = true
+    end
+
+    if ScalePlayerFrames == nil then
+        ScalePlayerFrames = true
+    end
+
+    if ScaleObjectiveTracker == nil then
+        ScaleObjectiveTracker = true
+    end
+
+end
+
+-- Apply scaling to a frame.
+local function ScaleFrame(frame)
+
+    if not frame then
+        return
+    end
+
+    -- Avoid changing protected frames during combat.
+    if InCombatLockdown and InCombatLockdown() then
+        pendingFrames[frame] = true
+        return
+    end
+
+    frame:SetScale(SCALE_VALUE)
+
+    -- Reapply scaling whenever the frame is displayed.
+    if not frame.OldEyesHooked then
+
+        frame:HookScript("OnShow", function(self)
+
+            if InCombatLockdown and InCombatLockdown() then
+                pendingFrames[self] = true
+            else
+                self:SetScale(SCALE_VALUE)
+            end
+
+        end)
+
+        frame.OldEyesHooked = true
+
+    end
+
+end
+
+-- Scale frames that are currently available.
+local function ApplyScaling()
+
+    -- Quest, gossip, books and group finder.
+    ScaleFrame(_G.QuestFrame)
+    ScaleFrame(_G.GossipFrame)
+    ScaleFrame(_G.ItemTextFrame)
+    ScaleFrame(_G.PVEFrame)
+
+    -- Merchant frame.
+    if ScaleMerchantFrame then
+        ScaleFrame(_G.MerchantFrame)
+    end
+
+    -- Player, target and focus frames.
+    if ScalePlayerFrames then
+
+        ScaleFrame(_G.PlayerFrame)
+        ScaleFrame(_G.TargetFrame)
+        ScaleFrame(_G.FocusFrame)
+
+    end
+
+    -- Objective tracker.
+    if ScaleObjectiveTracker then
+        ScaleFrame(_G.ObjectiveTrackerBlocksFrame)
+    end
+
+end
+
+-- Apply deferred scaling after combat ends.
+local function ApplyPendingScaling()
+
+    for frame in pairs(pendingFrames) do
+
+        if frame and frame.SetScale then
+            frame:SetScale(SCALE_VALUE)
+        end
+
+        pendingFrames[frame] = nil
+
+    end
+
+end
+
+-- Create the modern WoW settings panel.
+local function CreateOptionsPanel()
+
+    if optionsCategory then
+        return
+    end
+
+    if not Settings or not Settings.RegisterCanvasLayoutCategory then
+        return
+    end
+
+    local panel = CreateFrame("Frame")
+    panel.name = ADDON_NAME
+
+    -- Instructions.
+    local message = panel:CreateFontString(
+        nil,
+        "ARTWORK",
+        "GameFontNormal"
+    )
+
+    message:SetPoint("TOPLEFT", 32, -24)
+    message:SetText("Requires UI Reload")
+
+    -- Create a checkbox.
+    local function CreateOptionCheckbox(text, tooltip, variable, yOffset)
+
+        local checkbox = CreateFrame(
+            "CheckButton",
+            nil,
+            panel
+        )
+
+        checkbox:SetSize(24, 24)
+        checkbox:SetPoint("TOPLEFT", 32, yOffset)
+
+        local label = panel:CreateFontString(
+            nil,
+            "ARTWORK",
+            "GameFontNormal"
+        )
+
+        label:SetPoint("LEFT", checkbox, "RIGHT", 4, 0)
+        label:SetText(text)
+
+        checkbox:SetChecked(_G[variable])
+
+        checkbox:SetScript("OnClick", function(self)
+
+            _G[variable] = self:GetChecked()
+
+        end)
+
+        checkbox:SetScript("OnEnter", function(self)
+
+            GameTooltip:SetOwner(self, "ANCHOR_RIGHT")
+            GameTooltip:SetText(tooltip)
+            GameTooltip:Show()
+
+        end)
+
+        checkbox:SetScript("OnLeave", function()
+
+            GameTooltip:Hide()
+
+        end)
+
+    end
+
+    -- Merchant frame.
+    CreateOptionCheckbox(
+        "Scale Merchant Frame",
+        "Sets whether to scale the merchant frame.",
+        "ScaleMerchantFrame",
+        -56
+    )
+
+    -- Player frames.
+    CreateOptionCheckbox(
+        "Scale Player Frames",
+        "Sets whether to scale the player frames.",
+        "ScalePlayerFrames",
+        -88
+    )
+
+    -- Objective tracker.
+    CreateOptionCheckbox(
+        "Scale Objective Tracker",
+        "Sets whether to scale the objective tracker.",
+        "ScaleObjectiveTracker",
+        -120
+    )
+
+    -- Register the settings panel.
+    optionsCategory = Settings.RegisterCanvasLayoutCategory(
+        panel,
+        ADDON_NAME
+    )
+
+    optionsCategory.ID = ADDON_NAME
+
+    Settings.RegisterAddOnCategory(optionsCategory)
+
+end
+
+-- Register events.
 Frame:RegisterEvent("ADDON_LOADED")
+Frame:RegisterEvent("PLAYER_LOGIN")
+Frame:RegisterEvent("PLAYER_ENTERING_WORLD")
 Frame:RegisterEvent("PLAYER_LOGOUT")
+Frame:RegisterEvent("PLAYER_REGEN_ENABLED")
 
-OldEyes = {};
-OldEyes.panel = CreateFrame("Frame", "Old Eyes", UIParent);
-OldEyes.panel.name = "Old Eyes";
-InterfaceOptions_AddCategory(OldEyes.panel);
-
--- Label for user settings.
-local MsgFrame = CreateFrame("Frame", "Message Frame", OldEyes.panel);
-MsgFrame:SetPoint("TOPLEFT");
-MsgFrame:SetSize(100, 50);
-MsgFrame.Text = MsgFrame:CreateFontString(nil, "OVERLAY", "GameFontNormal");
-MsgFrame.Text:SetPoint("BOTTOM", MsgFrame, "TOP", 32, -30);
-MsgFrame.Text:SetText("Requires UI Reload");
-
--- Scale Merchant Frame
-ScaleMerchFrameCheckButton = CreateFrame("CheckButton", "ScaleMerchFrameCheckButton_GlobalName", OldEyes.panel, "InterfaceOptionsCheckButtonTemplate");
-ScaleMerchFrameCheckButton:SetPoint("TOPLEFT", 32, -32);
-ScaleMerchFrameCheckButton_GlobalNameText:SetText("Scale Merchant Frame");
-ScaleMerchFrameCheckButton.tooltip = "Sets whether to scale the merchant frame.";
-
-ScaleMerchFrameCheckButton:SetScript("OnClick", 
-function()
-
-	ScaleMerchantFrame = ScaleMerchFrameCheckButton:GetChecked();
-
-end
-);
-
--- Scale Player Frames
-ScalePlayerFramesCheckButton = CreateFrame("CheckButton", "ScalePlayerFramesCheckButton_GlobalName", OldEyes.panel, "InterfaceOptionsCheckButtonTemplate");
-ScalePlayerFramesCheckButton:SetPoint("TOPLEFT", 32, -64);
-ScalePlayerFramesCheckButton_GlobalNameText:SetText("Scale Player Frames");
-ScalePlayerFramesCheckButton.tooltip = "Sets whether to scale the player frames.";
-
-ScalePlayerFramesCheckButton:SetScript("OnClick",
-function()
-
-	ScalePlayerFrames = ScalePlayerFramesCheckButton:GetChecked();
-
-end
-);
-
--- Scale Objective Tracker
-ScaleObjectiveTrackerCheckButton = CreateFrame("CheckButton", "ScaleObjectiveTrackerCheckButton_GlobalName", OldEyes.panel, "InterfaceOptionsCheckButtonTemplate");
-ScaleObjectiveTrackerCheckButton:SetPoint("TOPLEFT", 32, -96);
-ScaleObjectiveTrackerCheckButton_GlobalNameText:SetText("Scale Objective Tracker");
-ScaleObjectiveTrackerCheckButton.tooltip = "Sets whether to scale the objective tracker.";
-
-ScaleObjectiveTrackerCheckButton:SetScript("OnClick",
-function()
-
-	ScaleObjectiveTracker = ScaleObjectiveTrackerCheckButton:GetChecked();
-
-end
-);
-
--- arg1 is the addon name.
 Frame:SetScript("OnEvent", function(self, event, arg1)
-	if event == "ADDON_LOADED" and arg1 == "Old Eyes" then
 
-		-- If no saved data for the addon variable (ScaleMerchantFrame)...
-		if ScaleMerchantFrame == nil then
+    if event == "ADDON_LOADED" then
 
-			ScaleMerchantFrame = true; -- Set default value.
+        if arg1 == ADDON_NAME then
 
-		end
-	
-		-- If there is saved data for the addon variable, use it to update the check button.
-		ScaleMerchFrameCheckButton:SetChecked(ScaleMerchantFrame);
+            InitializeSavedVariables()
+            CreateOptionsPanel()
 
-		-- If no saved data for the addon variable (ScalePlayerFrames)...
-		if ScalePlayerFrames == nil then
+        end
 
-			ScalePlayerFrames = true; -- Set default value.
+        -- Some Blizzard UI frames are loaded on demand.
+        ApplyScaling()
 
-		end
+    elseif event == "PLAYER_LOGIN" then
 
-		-- If there is saved data for the addon variable, use it to update the check button.
-		ScalePlayerFramesCheckButton:SetChecked(ScalePlayerFrames);
+        InitializeSavedVariables()
+        CreateOptionsPanel()
 
-		-- If no saved data for the addon variable (ScaleObjectiveTracker)...
-		if ScaleObjectiveTracker == nil then
+        ApplyScaling()
 
-			ScaleObjectiveTracker = true; -- Set default value.
+        print("Old Eyes (2026.11.3) Loaded. Developed by PHANTOM-40417")
 
-		end
+    elseif event == "PLAYER_ENTERING_WORLD" then
 
-		-- if there is saved data for the addon variable, use it to update the check button.
-		ScaleObjectiveTrackerCheckButton:SetChecked(ScaleObjectiveTracker);
+        ApplyScaling()
 
-		elseif event == "PLAYER_LOGOUT" then
+    elseif event == "PLAYER_REGEN_ENABLED" then
 
-			-- Save changes so they can be restored during the next gaming session.
-			ScaleMerchantFrame = ScaleMerchFrameCheckButton:GetChecked();
-			ScalePlayerFrames = ScalePlayerFramesCheckButton:GetChecked();
-			ScaleObjectiveTracker = ScaleObjectiveTrackerCheckButton:GetChecked();
+        ApplyPendingScaling()
 
-		elseif event == "PLAYER_LOGIN" then
+    end
 
-			QuestFrame:SetScale(SCALE_VALUE);			-- Quest Text
-			GossipFrame:SetScale(SCALE_VALUE);			-- Gossip/Speaking ??
-			ItemTextFrame:SetScale(SCALE_VALUE);		-- Books
-			PVEFrame:SetScale(SCALE_VALUE);				-- LFG
-
-			-- Scale merchant frame if player requests it.
-			if (ScaleMerchantFrame == true) then
-
-				MerchantFrame:SetScale(SCALE_VALUE);	-- Buy/Sell
-
-			end
-
-			-- Scale the player frames if the player requests it.
-			if (ScalePlayerFrames == true) then
-
-				PlayerFrame:SetScale(SCALE_VALUE);		-- Player Frame (Name/Avatar)
-				TargetFrame:SetScale(SCALE_VALUE);		-- Player's Target Frame
-				FocusFrame:SetScale(SCALE_VALUE);		-- Player's Focus Frame (Works well for Hunters)
-
-			end
-
-			-- Scale the objective tracker if the player requests it.
-			if(ScaleObjectiveTracker == true) then
-
-				ObjectiveTrackerBlocksFrame:SetScale(SCALE_VALUE);
-
-				--[[ 
-					Scaling the objective tracker causes clipping if both action bars are shown on the right side of the screen,
-					to counter this, the position of the objective tracker is slightly adjusted to the left.
-				--]]
-				ObjectiveTrackerBlocksFrame:SetPoint("RIGHT", -275, 300);
-
-			end
-
-			-- Display the copyright and version line in chat.
-			print("Old Eyes (2026.11.3) Loaded. Developed by PHANTOM-40417");
-		end
-	end
-)
+end)
