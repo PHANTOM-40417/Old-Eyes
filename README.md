@@ -6,7 +6,7 @@ An add-on for World of Warcraft that will modify the WoW interface to increase t
 
 # Repository
 
-[PHANTOM-40417/Old-Eyes: World of Warcraft Addon: If your eyes don't work like they used to, this addon will make many things easier to read.](https://github.com/PHANTOM-40417/Old-Eyes)
+https://github.com/PHANTOM-40417/Old-Eyes
 
 
 
