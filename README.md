@@ -1,39 +1,47 @@
-PRODUCT:	Old Eyes World of Warcraft Addon
-VERSION:	2021.0.0.0
-DEVELOPED BY:	Kenneth R. Jones (SyntaxSandbox.com), syntaxsandbox@outlook.com
+# Old Eyes
 
-DESCRIPTION:
+An add-on for World of Warcraft that will modify the WoW interface to increase the font size of quest, gossip and optionally, merchant frames.
 
-	Initial Version (Dec. 18, 2018):
-	--------------------------------
-	This addon will modify the WoW interface to increase the size of the quest, gossip, and, optionally, merchant frames, which will make reading the text much easier.
 
-	Version 2021.0.0.0 (July, 18, 2021)
-	-----------------------------------
-	Added support to increase the frame size for books.
-	Added support to increase the size of the LFG frame.
-	Added support to optionally increase the size of player frames (Player Name/Avatar, Target Frame, Focus Frame).
-	Added support to optionally increase the size of the objective tracker.
 
-OPTIONS:
+# Repository
 
-An in-game option is provided which allows the:
-	* merchant scaling to be turned on or off
-	* player frame scaling to be turned on or off
-	* objective tracker scaling to be turned on or off
+[PHANTOM-40417/Old-Eyes: World of Warcraft Addon: If your eyes don't work like they used to, this addon will make many things easier to read.](https://github.com/PHANTOM-40417/Old-Eyes)
 
-INSTALLATION:
 
-Copy the entire Old Eyes folder to your addon directory.
 
-NOTES:
+# Version History
 
-This addon has not been tested with other addons. If you encounter issues, please try disabling all other addons first, to see if that fixes the issue(s). I cannot provide support for other addons.
+### 2021.0.0.0
 
-LEGAL:
+July 18, 2021
 
-THIS SOFTWARE/ADDON IS PROVIDED “AS IS”, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE/ADDON OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+- Added support to increase the frame size for books.
 
-SUPPORT:
+- Added support to increase the size of the LFG frame.
 
-syntaxsandbox@outlook.com
+- Added support to optionally increase the size of the player frames.
+
+- Added support to optionally increase the size of the objective tracker.
+
+
+
+# Options
+
+Features an in-game option which allows **merchant scaling** to be enabled or disabled.
+
+Features an in-game option which allows player **frame scaling** to be enabled or disabled.
+
+Features an in-game option which allows objective **tracker scaling** to be enabled or disabled.
+
+
+
+# Installation
+
+1. Copy the entire add-on folder to your add-on directory.
+
+
+
+# Compatibility
+
+This add-on has not been tested with other add-ons. If you encounter issues, please try disabling all other add-ons to see if that resolves the issue. I do not provide support for other add-ons.
