@@ -1,7 +1,7 @@
-## Interface: 90100
+## Interface: 120105
 ## Title: Old Eyes
 ## SavedVariables: ScaleMerchantFrame, ScalePlayerFrames, ScaleObjectiveTracker
-## Author: Kenneth R. Jones (SyntaxSandbox.com)
-## Version: 2021.0.0.0
+## Author: PHANTOM-40417 (https://github.com/PHANTOM-40417)
+## Version: 2026.11.3
 
 Main.lua

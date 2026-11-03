@@ -139,7 +139,7 @@ Frame:SetScript("OnEvent", function(self, event, arg1)
 			end
 
 			-- Display the copyright and version line in chat.
-			print("Old Eyes (2021.0.0.0) Loaded. Developed by Kenneth R. Jones (SyntaxSanbox.com).");
+			print("Old Eyes (2026.11.3) Loaded. Developed by PHANTOM-40417");
 		end
 	end
 )
