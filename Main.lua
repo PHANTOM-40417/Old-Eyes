@@ -1,9 +1,9 @@
 
 local ADDON_NAME = "Old Eyes"
+local ADDON_VERSION = "2026.11.3"
 local SCALE_VALUE = 1.25
 
 local Frame = CreateFrame("Frame")
-
 local pendingFrames = {}
 local optionsCategory
 
@@ -24,14 +24,14 @@ local function InitializeSavedVariables()
 
 end
 
--- Apply scaling to a frame.
+-- Scale a frame and hook its OnShow event.
 local function ScaleFrame(frame)
 
     if not frame then
         return
     end
 
-    -- Avoid changing protected frames during combat.
+    -- Avoid scaling protected frames during combat.
     if InCombatLockdown and InCombatLockdown() then
         pendingFrames[frame] = true
         return
@@ -39,7 +39,6 @@ local function ScaleFrame(frame)
 
     frame:SetScale(SCALE_VALUE)
 
-    -- Reapply scaling whenever the frame is displayed.
     if not frame.OldEyesHooked then
 
         frame:HookScript("OnShow", function(self)
@@ -58,10 +57,10 @@ local function ScaleFrame(frame)
 
 end
 
--- Scale frames that are currently available.
+-- Apply scaling to available Blizzard frames.
 local function ApplyScaling()
 
-    -- Quest, gossip, books and group finder.
+    -- Quest text, gossip, books and group finder.
     ScaleFrame(_G.QuestFrame)
     ScaleFrame(_G.GossipFrame)
     ScaleFrame(_G.ItemTextFrame)
@@ -88,7 +87,7 @@ local function ApplyScaling()
 
 end
 
--- Apply deferred scaling after combat ends.
+-- Apply deferred scaling after combat.
 local function ApplyPendingScaling()
 
     for frame in pairs(pendingFrames) do
@@ -103,7 +102,7 @@ local function ApplyPendingScaling()
 
 end
 
--- Create the modern WoW settings panel.
+-- Create the checkbox settings panel.
 local function CreateOptionsPanel()
 
     if optionsCategory then
@@ -127,26 +126,18 @@ local function CreateOptionsPanel()
     message:SetPoint("TOPLEFT", 32, -24)
     message:SetText("Requires UI Reload")
 
-    -- Create a checkbox.
+    -- Create an individual checkbox.
     local function CreateOptionCheckbox(text, tooltip, variable, yOffset)
 
         local checkbox = CreateFrame(
             "CheckButton",
             nil,
-            panel
+            panel,
+            "ChatConfigCheckButtonTemplate"
         )
 
-        checkbox:SetSize(24, 24)
         checkbox:SetPoint("TOPLEFT", 32, yOffset)
-
-        local label = panel:CreateFontString(
-            nil,
-            "ARTWORK",
-            "GameFontNormal"
-        )
-
-        label:SetPoint("LEFT", checkbox, "RIGHT", 4, 0)
-        label:SetText(text)
+        checkbox.Text:SetText(text)
 
         checkbox:SetChecked(_G[variable])
 
@@ -212,7 +203,6 @@ end
 Frame:RegisterEvent("ADDON_LOADED")
 Frame:RegisterEvent("PLAYER_LOGIN")
 Frame:RegisterEvent("PLAYER_ENTERING_WORLD")
-Frame:RegisterEvent("PLAYER_LOGOUT")
 Frame:RegisterEvent("PLAYER_REGEN_ENABLED")
 
 Frame:SetScript("OnEvent", function(self, event, arg1)
@@ -224,10 +214,9 @@ Frame:SetScript("OnEvent", function(self, event, arg1)
             InitializeSavedVariables()
             CreateOptionsPanel()
 
-        end
+            ApplyScaling()
 
-        -- Some Blizzard UI frames are loaded on demand.
-        ApplyScaling()
+        end
 
     elseif event == "PLAYER_LOGIN" then
 
@@ -236,7 +225,11 @@ Frame:SetScript("OnEvent", function(self, event, arg1)
 
         ApplyScaling()
 
-        print("Old Eyes (2026.11.3) Loaded. Developed by PHANTOM-40417")
+        print(
+            ADDON_NAME ..
+            " (" .. ADDON_VERSION ..
+            ") Loaded. Developed by PHANTOM-40417"
+        )
 
     elseif event == "PLAYER_ENTERING_WORLD" then
 
