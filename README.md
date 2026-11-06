@@ -6,6 +6,14 @@ An add-on for World of Warcraft that will modify the WoW interface to increase t
 
 https://github.com/PHANTOM-40417/Old-Eyes
 
+# End of Service
+As I haven't been playing World of Warcraft since 2018, this add-on is being retired. Feel free to fork the repo and make any additional changes yourselves.
+
+# World of Warcraft: Forever Commands
+The following commands can be used as a starting point for World of Warcraft Forever frame scaling. This is as far as I got and I will not be continuing any further.
+
+https://gist.github.com/PHANTOM-40417
+
 # Version History
 
 ### 2026.11.3
