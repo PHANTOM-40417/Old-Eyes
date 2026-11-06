@@ -12,7 +12,7 @@ As I haven't been playing World of Warcraft since 2018, this add-on is being ret
 # World of Warcraft: Forever Commands
 The following commands can be used as a starting point for World of Warcraft Forever frame scaling. This is as far as I got and I will not be continuing any further.
 
-https://gist.github.com/PHANTOM-40417
+[https://gist.github.com/PHANTOM-40417](https://gist.github.com/PHANTOM-40417/7a9ff7928c5d1d8812240b7d62e8e30c)
 
 # Version History
 
